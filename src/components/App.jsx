@@ -19,7 +19,7 @@ export const App = () => {
   const [modalImage, setModalImage] = useState(null)
   const [total, setTotal] = useState(0)
 
-  const fetchPosts = () => {
+  function fetchPosts () {
     axios.get(`https://pixabay.com/api/?q=${search}&page=${page}&key=29243564-6faefde78431833ffd5a53afd&image_type=photo&orientation=horizontal&per_page=12`)
       .then(response => {
         setTotal(response.data.total)
@@ -69,7 +69,7 @@ export const App = () => {
     if (search !== '') {
       fetchPosts()
     }
-  }, [search, page])
+  }, [search, page,])
 
   const onLoadMoreBTN = () => {
     setPage(page + 1)
