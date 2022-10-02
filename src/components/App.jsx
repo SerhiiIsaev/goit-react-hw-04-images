@@ -20,23 +20,19 @@ export const App = () => {
   const [total, setTotal] = useState(0)
 
   const fetchPosts = () => {
-    console.log(search)
     axios.get(`https://pixabay.com/api/?q=${search}&page=${page}&key=29243564-6faefde78431833ffd5a53afd&image_type=photo&orientation=horizontal&per_page=12`)
       .then(response => {
         setTotal(response.data.total)
-        console.log(search)
         return response.data.hits
       })
       .then(data => {
         const dataArray = [];
-        data.map(({ id, webformatURL, largeImageURL }) => dataArray.push({ id, webformatURL, largeImageURL })
-        )
+        data.map(({ id, webformatURL, largeImageURL }) => dataArray.push({ id, webformatURL, largeImageURL }))
         if (dataArray.length === 0) {
           toast.info('not found any picture!');
         }
         return dataArray
-      }
-      )
+      })
       .then((newCards) => {
         if (cards.length === 0) {
           return setCards([...newCards])
@@ -93,7 +89,5 @@ export const App = () => {
       <ToastContainer autoClose={3000} />
       {showModal && modalImage && (<Modal onClose={toggleModal} modalImage={modalImage} />)}
     </div>
-  );
-  
-  
+  ); 
 }
