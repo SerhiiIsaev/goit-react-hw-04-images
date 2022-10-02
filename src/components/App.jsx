@@ -69,7 +69,9 @@ export const App = () => {
     if (search !== '') {
       fetchPosts()
     }
-  }, [search, page,])
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [search, page,])
 
   const onLoadMoreBTN = () => {
     setPage(page + 1)
