@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import { useState, useEffect } from 'react'
 import { ImageGallery } from "./ImageGallery/ImageGallery";
 import { Searchbar } from "./Searchbar/Searchbar";
 import axios from "axios";
@@ -9,127 +9,91 @@ import { Modal } from './Modal/Modal'
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+export const App = () => {
+  const [cards, setCards] = useState([])
+  const [search, setSearch] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [showModal, setShowModal] = useState(false)
+  const [modalImage, setModalImage] = useState(null)
+  const [total, setTotal] = useState(0)
 
-
-
-export class App extends Component {
-
-  state = {
-    cards: [],
-    search: "",
-    error: "",
-    loading: false,
-    page: 1,
-    showModal: false,
-    modalImage: null,
-    total: 0,
-  }
-
-
-
-  fetchPosts = () => {
-    const request = this.state.search
-    const page = this.state.page
-    axios.get(`https://pixabay.com/api/?q=${request}&page=${page}&key=29243564-6faefde78431833ffd5a53afd&image_type=photo&orientation=horizontal&per_page=12`)
+  const fetchPosts = () => {
+    console.log(search)
+    axios.get(`https://pixabay.com/api/?q=${search}&page=${page}&key=29243564-6faefde78431833ffd5a53afd&image_type=photo&orientation=horizontal&per_page=12`)
       .then(response => {
-        this.setState({
-          total: response.data.total,
-        })
-        console.log(response.data.total)
+        setTotal(response.data.total)
+        console.log(search)
         return response.data.hits
       })
-    .then(data => {
-      const dataArray = [];
-      data.map(({ id, webformatURL, largeImageURL }) =>dataArray.push({ id, webformatURL, largeImageURL })
-      )
-      if (dataArray.length === 0) {
-        toast.info('not found any picture!');
-      }
-      return dataArray
-    }
-    )
-    .then( (newCards) => {
-        this.setState((prevState) => {
-          if (prevState.cards.length === 0) {
-        return {
-        cards: newCards,
-      }
-      } else {
-        
-        return {
-          cards: [...prevState.cards, ...newCards]
+      .then(data => {
+        const dataArray = [];
+        data.map(({ id, webformatURL, largeImageURL }) => dataArray.push({ id, webformatURL, largeImageURL })
+        )
+        if (dataArray.length === 0) {
+          toast.info('not found any picture!');
         }
+        return dataArray
       }
-      
-      })
-    })
-    .catch(error => {
-      this.setState({
-        error
-      })
-    })
-      .finally(() => this.setState({
-        loading: false,  
-      })
       )
+      .then((newCards) => {
+        if (cards.length === 0) {
+          return setCards([...newCards])
+        } else {
+          return setCards([...cards, ...newCards])
+        }
+      })
+      .catch(error => {
+        setError(error)
+        toast.error('sorry, we have a problem')
+      })
+      .finally(() => setLoading(false))
   }
 
-  onFormSubmit = (e) => {
+  const onFormSubmit = (e) => {
     e.preventDefault()
     const searchValue = e.target.elements.searchInput.value
-    if (searchValue !== "" && searchValue !== this.state.search) {
-      this.setState({
-      cards: [],
-      search: searchValue,
-      page: 1,
-      loading: true,
-      
-    })
+    if (searchValue !== "" && searchValue !== search) {
+      setCards([])
+      setSearch(searchValue)
+      setPage(1)
+      setLoading(true)
     } else if (searchValue === "") {
       toast.info('input is empty!');
     }
-    
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.search !== prevState.search || this.state.page !== prevState.page) {
-      setTimeout(this.fetchPosts, 200) 
+  useEffect(() => {
+    if (search !== '') {
+      setTimeout(fetchPosts, 200)
     }
-  }
+  }, [search, page])
 
-  onLoadMoreBTN = () => {
-    this.setState((prevState) => {
-      return {
-        page: prevState.page + 1,
-        loading: true,
-      }
-    })
+  const onLoadMoreBTN = () => {
+    setPage(page + 1)
+    setLoading(true)
   }
   
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({ showModal: !showModal, }));
+  const toggleModal = () => {
+    setShowModal(!showModal)
   }
   
-  openModal = (largeImageURL) => {
-    this.setState({
-      modalImage: largeImageURL,
-    })
-    this.toggleModal()
-
+  const openModal = (largeImageURL) => {
+    setModalImage(largeImageURL)
+    toggleModal()
   }
 
-  render() {
-    const {showModal,modalImage, total} = this.state
-    return (
-      <div className={styles.App}>
-        <Searchbar onFormSubmit={this.onFormSubmit} />
-        <ImageGallery cards={this.state.cards} onOpen={this.openModal} />
-        {this.state.loading && <Loader/>}
-        {this.state.cards.length > 1 && this.state.cards.length < total && <Button onLoadMoreBTN={this.onLoadMoreBTN} />}
-        <ToastContainer autoClose={3000} />
-        {showModal && modalImage && (<Modal onClose={this.toggleModal} modalImage={modalImage} />)}
-      </div>
-    );
-  }
+  return (
+    <div className={styles.App}>
+      <Searchbar onFormSubmit={onFormSubmit} />
+      <ImageGallery cards={cards} onOpen={openModal} />
+      {loading && <Loader/>}
+      {cards.length > 1 && cards.length < total && <Button onLoadMoreBTN={onLoadMoreBTN} />}
+      <ToastContainer autoClose={3000} />
+      {showModal && modalImage && (<Modal onClose={toggleModal} modalImage={modalImage} />)}
+    </div>
+  );
   
-};
+  
+}
