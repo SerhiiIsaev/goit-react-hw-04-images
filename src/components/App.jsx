@@ -44,7 +44,12 @@ export const App = () => {
         setError(error)
         toast.error('sorry, we have a problem')
       })
-      .finally(() => setLoading(false))
+      .finally(() => {
+        setLoading(false)
+        if (error) {
+          console.log(error)
+        }
+      })
   }
 
   const onFormSubmit = (e) => {
@@ -62,7 +67,7 @@ export const App = () => {
 
   useEffect(() => {
     if (search !== '') {
-      setTimeout(fetchPosts, 200)
+      fetchPosts()
     }
   }, [search, page])
 
