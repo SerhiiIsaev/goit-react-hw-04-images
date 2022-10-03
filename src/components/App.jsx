@@ -54,7 +54,6 @@ export const App = () => {
         })
         .catch(catchedError => {
           setError(catchedError)
-          console.log(error)
           toast.error('sorry, we have a problem')
         })
         .finally(() => {
@@ -63,7 +62,14 @@ export const App = () => {
       }
       fetchPosts()
     }
-  },[search, page])
+  }, [search, page])
+  
+  useEffect(() => {
+    // тут повинне бути опрацювання помилки
+    if (error) {
+      console.log(error)
+    }
+  },[error])
 
   const onLoadMoreBTN = () => {
     setPage(page + 1)
