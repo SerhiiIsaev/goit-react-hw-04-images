@@ -68,8 +68,7 @@ export const App = () => {
       }
       fetchPosts()
     }
-  },
-  [search, page])
+  },[search, page])
 
   const onLoadMoreBTN = () => {
     setPage(page + 1)
