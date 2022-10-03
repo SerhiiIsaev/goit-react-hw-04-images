@@ -1,44 +1,44 @@
-import React, { Component } from "react";
+import { useEffect } from "react";
 import { createPortal } from 'react-dom';
 import styles from './Modal.module.css'
 import PropTypes from "prop-types";
 
 const modalRoot = document.getElementById('root');
 
-class Modal extends Component {
+const Modal =({modalImage, onClose})=> {
         
-  componentDidMount() {
-      window.addEventListener('keydown', this.handleKeyDown);
-      window.addEventListener('click', this.handleCloseClick)
-  }
-
-  componentWillUnmount() {
-      window.removeEventListener('keydown', this.handleKeyDown);
-      window.removeEventListener('click', this.handleCloseClick)
-  }
-
-  handleKeyDown = e => {
-    if (e.code === 'Escape') {
-      return this.props.onClose();
-    }
+  useEffect(() => {
+    const handleKeyDown = e => {
+      if (e.code === 'Escape') {
+        return onClose();
+      }
     };
     
-    handleCloseClick = e => {
+    const handleCloseClick = e => {
 
-        if (e.target.alt === undefined ) {
-            return this.props.onClose();
-        }      
+      if (e.target.alt === undefined ) {
+        return onClose();
+      }      
     }
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('click', handleCloseClick)
 
-  render() {
-    return createPortal(
-      <div className={styles.overlay}>
-        <div className={styles.modal}>
-          <img src={this.props.modalImage} alt="modalPicture" />
-        </div>
-      </div>, modalRoot
-    );
-  }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('click', handleCloseClick)
+    } 
+  },[])
+  
+
+  
+  return createPortal(
+    <div className={styles.overlay}>
+      <div className={styles.modal}>
+        <img src={modalImage} alt="modalPicture" />
+      </div>
+    </div>, modalRoot
+  );
+  
 }
 
 export {Modal}

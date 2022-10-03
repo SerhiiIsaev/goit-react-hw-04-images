@@ -19,39 +19,6 @@ export const App = () => {
   const [modalImage, setModalImage] = useState(null)
   const [total, setTotal] = useState(0)
 
-  function fetchPosts () {
-    axios.get(`https://pixabay.com/api/?q=${search}&page=${page}&key=29243564-6faefde78431833ffd5a53afd&image_type=photo&orientation=horizontal&per_page=12`)
-      .then(response => {
-        setTotal(response.data.total)
-        return response.data.hits
-      })
-      .then(data => {
-        const dataArray = [];
-        data.map(({ id, webformatURL, largeImageURL }) => dataArray.push({ id, webformatURL, largeImageURL }))
-        if (dataArray.length === 0) {
-          toast.info('not found any picture!');
-        }
-        return dataArray
-      })
-      .then((newCards) => {
-        if (cards.length === 0) {
-          return setCards([...newCards])
-        } else {
-          return setCards([...cards, ...newCards])
-        }
-      })
-      .catch(error => {
-        setError(error)
-        toast.error('sorry, we have a problem')
-      })
-      .finally(() => {
-        setLoading(false)
-        if (error) {
-          console.log(error)
-        }
-      })
-  }
-
   const onFormSubmit = (e) => {
     e.preventDefault()
     const searchValue = e.target.elements.searchInput.value
@@ -67,11 +34,42 @@ export const App = () => {
 
   useEffect(() => {
     if (search !== '') {
+      const fetchPosts  = () => {
+        axios.get(`https://pixabay.com/api/?q=${search}&page=${page}&key=29243564-6faefde78431833ffd5a53afd&image_type=photo&orientation=horizontal&per_page=12`)
+          .then(response => {
+          setTotal(response.data.total)
+          return response.data.hits
+        })
+        .then(data => {
+          const dataArray = [];
+          data.map(({ id, webformatURL, largeImageURL }) => dataArray.push({ id, webformatURL, largeImageURL }))
+          if (dataArray.length === 0) {
+            toast.info('not found any picture!');
+          }
+          return dataArray
+        })
+        .then((newCards) => {
+          if (cards.length === 0) {
+            return setCards([...newCards])
+          } else {
+            return setCards(cards => [...cards, ...newCards])
+          }
+        })
+        .catch(error => {
+          setError(error)
+          toast.error('sorry, we have a problem')
+        })
+        .finally(() => {
+          setLoading(false)
+          if (error) {
+            console.log(error)
+          }
+        })
+      }
       fetchPosts()
     }
   },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [search, page,])
+  [search, page])
 
   const onLoadMoreBTN = () => {
     setPage(page + 1)
