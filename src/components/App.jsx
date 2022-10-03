@@ -49,11 +49,9 @@ export const App = () => {
           return dataArray
         })
         .then((newCards) => {
-          if (cards.length === 0) {
-            return setCards([...newCards])
-          } else {
-            return setCards(cards => [...cards, ...newCards])
-          }
+          
+          return setCards(cards => [...cards, ...newCards])
+          
         })
         .catch(error => {
           setError(error)
@@ -61,15 +59,11 @@ export const App = () => {
         })
         .finally(() => {
           setLoading(false)
-          if (error) {
-            console.log(error)
-          }
         })
       }
       fetchPosts()
     }
   },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   [search, page])
 
   const onLoadMoreBTN = () => {
