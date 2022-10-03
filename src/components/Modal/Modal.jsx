@@ -27,7 +27,7 @@ const Modal =({modalImage, onClose})=> {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('click', handleCloseClick)
     } 
-  },)
+  })
   
 
   

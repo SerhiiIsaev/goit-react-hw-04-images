@@ -26,6 +26,7 @@ export const App = () => {
       setCards([])
       setSearch(searchValue)
       setPage(1)
+      setError('')
       setLoading(true)
     } else if (searchValue === "") {
       toast.info('input is empty!');
@@ -49,12 +50,11 @@ export const App = () => {
           return dataArray
         })
         .then((newCards) => {
-          
           return setCards(cards => [...cards, ...newCards])
-          
         })
-        .catch(error => {
-          setError(error)
+        .catch(catchedError => {
+          setError(catchedError)
+          console.log(error)
           toast.error('sorry, we have a problem')
         })
         .finally(() => {
@@ -63,8 +63,7 @@ export const App = () => {
       }
       fetchPosts()
     }
-  },
-  [search, page])
+  },[search, page])
 
   const onLoadMoreBTN = () => {
     setPage(page + 1)
